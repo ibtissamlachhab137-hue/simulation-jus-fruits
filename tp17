@@ -1,0 +1,62 @@
+
+# DEBIT MASSIQUE DE DEPART
+m0 = 1000
+
+# FRACTIONS MASSIQUES
+x0 = 0.02       # Insoluble
+y0 = 0.10       # Soluble
+meau = 0.88     # Eau
+
+# OPERATION 1 : FILTRATION
+m1 = m0 - (m0 * x0)
+y1 = (y0 * m0) / m1
+
+print("Debit apres filtration :", m1, "kg/h")
+print("Fraction soluble apres filtration :", y1)
+
+# OPERATION 2 : MELANGE
+mR = 100
+yR = 0.40
+
+m2 = m1 + mR
+y2 = (m1 * y1 + mR * yR) / m2
+
+print("Debit apres melange :", m2, "kg/h")
+print("Fraction soluble apres melange :", y2)
+
+# OPERATION 3 : CHAUFFAGE
+T2 = 20
+T3 = 80
+Cp = 3.8
+
+Q3 = m2 * Cp * (T3 - T2) / 3600
+
+print("Puissance de chauffage :", Q3, "kW")
+
+# OPERATION 4 : EVAPORATION
+x4 = 0.40
+lambda_v = 2300
+
+m4 = (m2 * y2) / x4
+mv = m2 - m4
+
+Q4 = mv * lambda_v / 3600
+
+print("Debit du concentre :", m4, "kg/h")
+print("Eau evaporee :", mv, "kg/h")
+print("Puissance evaporation :", Q4, "kW")
+
+# OPERATION 5 : REFROIDISSEMENT
+T4 = 80
+T5 = 25
+
+Q5 = m4 * Cp * (T4 - T5) / 3600
+
+print("Puissance refroidissement :", Q5, "kW")
+
+# VERIFICATION DU BILAN GLOBAL
+entrees = m0 + mR
+sorties = m0*x0 + mv + m4
+
+print("Erreur bilan global :", entrees - sorties, "kg/h")
+
