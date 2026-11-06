@@ -1,0 +1,179 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulateur de procédés</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #eef4f8;
+            margin: 0;
+            padding: 30px;
+            color: #263746;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: auto;
+        }
+
+        .carte {
+            background: white;
+            padding: 25px;
+            margin-bottom: 22px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        h1 {
+            background: #123b5d;
+            color: white;
+            text-align: center;
+            padding: 25px;
+            border-radius: 10px;
+        }
+
+        h2 {
+            color: #087e8b;
+            border-bottom: 2px solid #20b2aa;
+            padding-bottom: 10px;
+        }
+
+        label {
+            display: inline-block;
+            width: 270px;
+            margin: 12px 0;
+            font-weight: bold;
+        }
+
+        input {
+            padding: 10px;
+            width: 180px;
+            border: 1px solid #b8cbd8;
+            border-radius: 6px;
+        }
+
+        button {
+            background: #087e8b;
+            color: white;
+            padding: 13px 25px;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 15px;
+        }
+
+        button:hover {
+            background: #065d68;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th {
+            background: #123b5d;
+            color: white;
+            padding: 13px;
+        }
+
+        td {
+            padding: 12px;
+            border: 1px solid #d5e1e8;
+        }
+
+        tr:nth-child(even) {
+            background: #eaf5f7;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- CARTE 1 : TITRE -->
+    <div class="carte">
+        <h1>Simulateur de concentration du jus de fruits</h1>
+        <p>Application de modélisation et simulation des procédés</p>
+    </div>
+
+    <!-- CARTE 2 : DONNEES -->
+    <div class="carte">
+        <h2>Données d'entrée</h2>
+
+        <label>Débit initial (kg/h) :</label>
+        <input type="number" id="debit" value="1000"><br>
+
+        <label>Jus concentré ajouté (kg/h) :</label>
+        <input type="number" id="ajout" value="100"><br>
+
+        <label>Concentration finale (%) :</label>
+        <input type="number" id="concentration" value="40"><br>
+
+        <label>Température de chauffage (°C) :</label>
+        <input type="number" id="temperature" value="80"><br>
+
+        <button onclick="calculer()">Lancer la simulation</button>
+    </div>
+
+    <!-- CARTE 3 : RESULTATS -->
+    <div class="carte">
+        <h2>Résultats de la simulation</h2>
+        <div id="resultats">
+            Les résultats apparaîtront ici.
+        </div>
+    </div>
+
+</div>
+
+<script>
+async function calculer() {
+
+    const donnees = {
+        debit: Number(document.getElementById("debit").value),
+        ajout: Number(document.getElementById("ajout").value),
+        concentration: Number(document.getElementById("concentration").value),
+        temperature: Number(document.getElementById("temperature").value)
+    };
+
+    const reponse = await fetch("/calcul", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(donnees)
+    });
+
+    const resultat = await reponse.json();
+
+    let tableau = `
+    <table>
+        <tr>
+            <th>Paramètre</th>
+            <th>Résultat</th>
+        </tr>`;
+
+    for (let [nom, valeur] of Object.entries(resultat)) {
+        tableau += `
+        <tr>
+            <td>${nom}</td>
+            <td>${valeur}</td>
+        </tr>`;
+    }
+
+    tableau += "</table>";
+
+    document.getElementById("resultats").innerHTML = tableau;
+}
+</script>
+
+</body>
+</html>
+
+
+
