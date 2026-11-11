@@ -1,0 +1,42 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historique des simulations</title>
+</head>
+<body>
+
+    <h1>Historique des simulations</h1>
+
+    <p>Utilisateur : {{ user.email }}</p>
+
+    <a href="/">Retour au simulateur</a>
+
+    <form action="/logout" method="post">
+        <button type="submit">Déconnexion</button>
+    </form>
+
+    {% if historique %}
+        {% for element in historique %}
+            <hr>
+            <h2>Simulation du {{ element.simulation.created_at }}</h2>
+
+            <p>Débit : {{ element.simulation.debit }} kg/h</p>
+            <p>Ajout : {{ element.simulation.ajout }} kg/h</p>
+            <p>Concentration : {{ element.simulation.concentration }} %</p>
+            <p>Température : {{ element.simulation.temperature }} °C</p>
+
+            <h3>Résultats</h3>
+
+            {% for nom, valeur in element.resultats.items() %}
+                <p>{{ nom }} : {{ valeur }}</p>
+            {% endfor %}
+        {% endfor %}
+    {% else %}
+        <p>Vous n'avez pas encore effectué de simulation.</p>
+    {% endif %}
+
+</body>
+</html>

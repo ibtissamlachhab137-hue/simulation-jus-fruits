@@ -28,6 +28,25 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         }
 
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .navigation a {
+            color: #087e8b;
+            font-weight: bold;
+            text-decoration: none;
+            margin-right: 15px;
+        }
+
+        .navigation button {
+            margin-top: 0;
+        }
+
         h1 {
             background: #123b5d;
             color: white;
@@ -91,12 +110,41 @@
         tr:nth-child(even) {
             background: #eaf5f7;
         }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 12px;
+            }
+
+            label {
+                width: 100%;
+            }
+
+            input {
+                width: 90%;
+            }
+        }
     </style>
 </head>
 
 <body>
 
 <div class="container">
+
+    <!-- NAVIGATION -->
+    <div class="carte navigation">
+        <div>
+            <strong>Bienvenue : {{ user.email }}</strong>
+        </div>
+
+        <div>
+            <a href="/historique">Mon historique</a>
+
+            <form action="/logout" method="post" style="display:inline;">
+                <button type="submit">Déconnexion</button>
+            </form>
+        </div>
+    </div>
 
     <!-- CARTE 1 : TITRE -->
     <div class="carte">
@@ -143,37 +191,56 @@ async function calculer() {
         temperature: Number(document.getElementById("temperature").value)
     };
 
-    const reponse = await fetch("/calcul", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(donnees)
-    });
+    const zoneResultats = document.getElementById("resultats");
 
-    const resultat = await reponse.json();
+    try {
+        zoneResultats.innerHTML = "Calcul en cours...";
 
-    let tableau = `
-    <table>
-        <tr>
-            <th>Paramètre</th>
-            <th>Résultat</th>
-        </tr>`;
+        const reponse = await fetch("/calcul", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(donnees)
+        });
 
-    for (let [nom, valeur] of Object.entries(resultat)) {
-        tableau += `
-        <tr>
-            <td>${nom}</td>
-            <td>${valeur}</td>
-        </tr>`;
+        if (reponse.status === 401) {
+            window.location.href = "/login";
+            return;
+        }
+
+        if (!reponse.ok) {
+            throw new Error("Erreur pendant le calcul.");
+        }
+
+        const resultat = await reponse.json();
+
+        let tableau = `
+        <table>
+            <tr>
+                <th>Paramètre</th>
+                <th>Résultat</th>
+            </tr>`;
+
+        for (let [nom, valeur] of Object.entries(resultat)) {
+            tableau += `
+            <tr>
+                <td>${nom}</td>
+                <td>${valeur}</td>
+            </tr>`;
+        }
+
+        tableau += "</table>";
+
+        zoneResultats.innerHTML = tableau;
+
+    } catch (erreur) {
+        zoneResultats.textContent = erreur.message;
     }
-
-    tableau += "</table>";
-
-    document.getElementById("resultats").innerHTML = tableau;
 }
 </script>
 
 </body>
 </html>
+
 
 
 
